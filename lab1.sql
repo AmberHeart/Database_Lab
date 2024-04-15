@@ -1,3 +1,4 @@
+-- Active: 1713010429592@@127.0.0.1@3306@lab1
 CREATE DATABASE lab1;
 USE lab1;
 -- 删除表格
@@ -224,3 +225,208 @@ C. 如果该图书存在预约记录，而当前借阅者没有预约，则不�
 D. 如果借阅者已经预约了该图书，则允许借阅，但要求借阅完成后删除借阅者对该图书的预约记录；
 E. 借阅成功后图书表中的 times 加 1，修改 bstatus，并在borrow表中插入相应借阅信息。 
 */
+DROP PROCEDURE IF EXISTS borrowBook;
+DELIMITER //
+CREATE PROCEDURE borrowBook(IN input_reader_id CHAR(8), IN input_book_id CHAR(8))
+BEGIN
+    DECLARE borrowed_count INT;
+    DECLARE is_borrowed_today BOOL;
+    DECLARE has_reservation BOOL;
+    DECLARE reservation_exists BOOL;
+    DECLARE cannot_borrow BOOL;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SELECT 'error' AS error_msg;
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    -- 初始化变量
+    SET borrowed_count = 0;
+    SET has_reservation = FALSE;
+    SET reservation_exists = FALSE;
+    SET cannot_borrow = FALSE;
+
+    -- 检查读者已借阅数量是否超过 3 本
+    SELECT COUNT(*) INTO borrowed_count
+    FROM borrow
+    WHERE reader_ID = input_reader_id AND borrow_date IS NOT NULL AND return_date IS NULL;
+
+    IF borrowed_count >= 3 THEN
+        SELECT CONCAT('Reader ', input_reader_id, ' has already borrowed 3 books.') AS error_msg;
+        SET cannot_borrow = TRUE;
+    END IF;
+
+    -- 检查是否重复借阅同一本书
+    SELECT EXISTS (
+        SELECT 1
+        FROM borrow
+        WHERE book_ID = input_book_id AND reader_ID = input_reader_id AND borrow_date = '2024-05-9'
+    ) INTO is_borrowed_today;
+
+    IF is_borrowed_today THEN
+        SELECT CONCAT('Reader ', input_reader_id, ' has borrowed book ', input_book_id, ' today.') AS error_msg;
+        SET cannot_borrow = TRUE;
+    END IF;
+
+    -- 检查是否存在预约记录
+    SELECT EXISTS (
+        SELECT 1
+        FROM reserve
+        WHERE book_ID = input_book_id
+    ) INTO reservation_exists;
+
+    -- 检查读者是否已预约该书
+    SELECT EXISTS (
+        SELECT 1
+        FROM reserve
+        WHERE book_ID = input_book_id AND reader_ID = input_reader_id
+    ) INTO has_reservation;
+
+    IF reservation_exists AND NOT has_reservation THEN
+        SELECT CONCAT('Book ', input_book_id, ' is reserved by others.') AS error_msg;
+        SET cannot_borrow = TRUE;
+    END IF;
+
+    -- 借阅成功,更新相关表
+    IF cannot_borrow = FALSE THEN
+        UPDATE book
+        SET bstatus = 1, borrow_times = borrow_times + 1
+        WHERE bid = input_book_id;
+
+        INSERT INTO borrow (book_ID, reader_ID, borrow_Date, return_Date)
+        VALUES (input_book_id, input_reader_id, '2024-05-9', NULL);
+
+        IF has_reservation THEN
+            DELETE FROM reserve
+            WHERE book_ID = input_book_id AND reader_ID = input_reader_id;
+        END IF;
+
+        SELECT CONCAT('Reader ', input_reader_id, ' borrowed book ', input_book_id, ' successfully.') AS success_msg;
+    END IF;
+
+    COMMIT;
+END //
+DELIMITER ;
+
+# 测试存储过程
+CALL borrowBook('R001', 'B008');
+CALL borrowBook('R001', 'B001');
+CALL borrowBook('R001', 'B001');
+CALL borrowBook('R005', 'B008');
+
+-- 参考 4，设计一个存储过程 returnBook，当读者还书时调用该存储过程完成还书处理。
+/* 要求：
+A. 还书后补上借阅表 borrow 中对应记录的 return_date;
+B. 还书后将图书表 book 中对应记录的 bstatus 修改为 0（没有其他预约）或 2（有其他预约） 。 
+*/
+DROP PROCEDURE IF EXISTS returnBook;
+DELIMITER //
+CREATE PROCEDURE returnBook(IN input_reader_id CHAR(8), IN input_book_id CHAR(8))
+BEGIN
+    DECLARE has_borrowed BOOL;
+    DECLARE has_reservation BOOL;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SELECT 'Error occurred during return book process.' AS error_msg;
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    -- 初始化变量
+    SET has_borrowed = TRUE;
+    SET has_reservation = FALSE;
+
+    -- 检查读者是否已借阅该书
+    IF NOT EXISTS (
+        SELECT 1
+        FROM borrow
+        WHERE reader_ID = input_reader_id AND book_ID = input_book_id AND return_date IS NULL
+    ) THEN
+        SELECT CONCAT('Reader ', input_reader_id, ' has not borrowed book ', input_book_id, '.') AS error_msg;
+        SET has_borrowed = FALSE;
+    END IF;
+
+    -- 检查是否有其他读者预约该书
+    SELECT EXISTS (
+        SELECT 1
+        FROM reserve
+        WHERE book_ID = input_book_id AND reader_ID <> input_reader_id
+    ) INTO has_reservation;
+
+    IF has_borrowed THEN
+        -- 更新借阅记录的归还日期
+        UPDATE borrow
+        SET return_date = '2024-05-10'
+        WHERE reader_ID = input_reader_id AND book_ID = input_book_id AND return_date IS NULL;
+
+        -- 更新图书状态
+        IF has_reservation THEN
+            UPDATE book
+            SET bstatus = 2  -- 有其他预约
+            WHERE bid = input_book_id;
+        ELSE
+            UPDATE book
+            SET bstatus = 0  -- 无预约
+            WHERE bid = input_book_id;
+        END IF;
+
+        SELECT CONCAT('Reader ', input_reader_id, ' returned book ', input_book_id, ' successfully.') AS success_msg;
+    END IF;
+
+    COMMIT;
+END //
+DELIMITER ;
+
+-- 测试存储过程
+CALL returnBook('R001', 'B008');
+# 展示book表中的bstatus以及borrow表中的return_date变化
+SELECT * FROM book WHERE bid = 'B001';
+SELECT * FROM borrow WHERE book_ID = 'B001' AND reader_ID = 'R001';
+CALL returnBook('R001', 'B001');
+SELECT * FROM book WHERE bid = 'B001';
+SELECT * FROM borrow WHERE book_ID = 'B001' AND reader_ID = 'R001';
+
+
+-- 设计触发器，实现：
+DELIMITER //
+# A. 当一本书被预约时, 自动将图书表 book 中相应图书的 bstatus修改为 2，并增加 reserve_Times；
+CREATE TRIGGER trigger_reserve_book
+AFTER INSERT ON reserve
+FOR EACH ROW
+BEGIN
+    UPDATE book
+    SET bstatus = 2, reserve_times = reserve_times + 1
+    WHERE bid = NEW.book_id;
+END;
+//
+
+CREATE TRIGGER reserve_cancelled
+AFTER DELETE ON reserve
+FOR EACH ROW
+BEGIN
+    # B. 当某本预约的书被借出时或者读者取消预约时，自动减少 reserve_Times
+    UPDATE book
+    SET reserve_Times = reserve_Times - 1
+    WHERE bid = OLD.book_ID;
+    
+    # C. 当某本书的最后一位预约者取消预约且该书未被借出（修改前 bstatus 为 2）时，将 bstatus 改为 0
+    IF NOT EXISTS (
+        SELECT 1 FROM reserve WHERE book_ID = OLD.book_ID
+    ) THEN
+        UPDATE book
+        SET bstatus = 0
+        WHERE bid = OLD.book_ID AND bstatus = 2;
+    END IF;
+END;
+//
+DELIMITER ;
+
+-- 测试触发器
+SELECT * FROM book WHERE bid = 'B012';
+INSERT INTO reserve (book_id, reader_id, reserve_Date, take_date) VALUES ('B012', 'R001', '2024-06-08', NULL); # 预约书籍
+SELECT * FROM book WHERE bid = 'B012';
+DELETE FROM reserve WHERE book_id = 'B012'; # 取消预约
+SELECT * FROM book WHERE bid = 'B012';
