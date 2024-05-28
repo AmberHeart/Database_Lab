@@ -108,10 +108,13 @@ def bank_user_edit(request, user_id):
 @login_required
 def get_users(request):
     branch_name = None
+    user_name = request.user.username
     if request.user.is_superuser:
-        branch_name = request.user.username
-    if branch_name:
-        users_lists = BankUser.objects.filter(branch_id=branch_name)
+        if user_name == 'admin':
+            users_lists = BankUser.objects.all()
+        else:
+            users_lists = BankUser.objects.filter(branch=user_name)
+
         paginator = Paginator(users_lists, 4)
         page = request.GET.get('page')
         users = paginator.get_page(page)

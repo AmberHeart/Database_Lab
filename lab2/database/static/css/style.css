@@ -1,0 +1,19 @@
+.pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    margin-bottom: 0;
+}
+
+footer {
+    margin-top: 20px;
+    padding-top: 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}

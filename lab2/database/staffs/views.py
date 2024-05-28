@@ -109,6 +109,11 @@ def set_manager(request, staff_id, department_id):
         return render(request, 'frontend/error.html')
     staff = Staff.objects.get(staff_id=staff_id)
     department = BranchDepartments.objects.get(department_id=department_id)
+
+    if staff.department != department:
+        messages.error(request, '员工不在该部门, 不能设置为经理')
+        return render(request, 'frontend/error.html')
+
     # if there is a manager in this department, delete it
     if Manager.objects.filter(department=department):
         manager = Manager.objects.get(department=department)
