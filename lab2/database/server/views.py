@@ -14,11 +14,6 @@ from decimal import Decimal
 
 from .serializers import *
 
-# class ProjectList(generics.ListCreateAPIView):
-#     queryset = server.objects.all()
-#     serializer_class = ProjectSerializer
-
-
 class BranchViewSet(viewsets.ModelViewSet):
     queryset = Branch.objects.all()
     serializer_class = BranchSerializer
