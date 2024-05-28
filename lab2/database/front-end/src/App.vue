@@ -1,4 +1,27 @@
-<script setup>
+<template>
+  <el-container>
+    <el-header><app-header/></el-header>
+    <el-main style="margin: 25px"><router-view/></el-main>
+  </el-container>
+</template>
+
+<script>
+import AppHeader from "./components/AppHeader.vue";
+
+export default {
+  name: 'App',
+  components: {
+    AppHeader,
+  },
+  computed: {
+    isHome() {
+      return this.$route.name in window
+    }
+  }
+};
+</script>
+
+<!-- <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 </script>
@@ -82,4 +105,4 @@ nav a:first-of-type {
     margin-top: 1rem;
   }
 }
-</style>
+</style> -->
