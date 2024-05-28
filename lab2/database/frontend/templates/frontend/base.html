@@ -33,6 +33,7 @@
                     {% if user.is_superuser %}
                         <a class="dropdown-item" href="/admin">系统后台</a>
                         <a class="dropdown-item" href="{% url 'users:get_users' %}">客户信息</a>
+                        <a class="dropdown-item" href="{% url 'staffs:staffs' %}">员工信息</a>
                         <a class="dropdown-item" href="{% url 'loans:branch_loans' %}">贷款信息</a>
                     {% else %}
                         <a class="dropdown-item" href="{% url 'accounts:accounts' user.id %}">账户信息</a>

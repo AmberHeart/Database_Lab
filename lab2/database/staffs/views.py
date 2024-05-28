@@ -1,21 +1,34 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Staff, Manager
 from django.core.paginator import Paginator
 from .forms import StaffEditForm, StaffCreateForm
 from department.models import BranchDepartments
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
+@login_required
 def staffs(request):
-    staffs_lists = Staff.objects.all()
+    user = request.user
+
+    if user.is_superuser:
+        if user.username == 'admin':
+            staffs_lists = Staff.objects.all()
+        else:
+            staffs_lists = Staff.objects.filter(department__branch_id=user.username)
+    else:
+        messages.error(request, '你没有权限查看员工信息')
+        return render(request, 'frontend/error.html')
+
     paginator = Paginator(staffs_lists, 4)
     page = request.GET.get('page')
     staffs_list = paginator.get_page(page)
+
     context = {'staffs': staffs_list}
     return render(request, 'staffs/staffs.html', context)
 
-
+@login_required
 def create_staff(request, department_id):
     name = None
     if request.user.is_superuser:
@@ -45,56 +58,67 @@ def create_staff(request, department_id):
     context = {'form': form, 'department': department}
     return render(request, 'staffs/create_staff.html', context)
 
-
+@login_required
 def edit_staff(request, staff_id):
-    # judge if user is superuser
-    if not request.user.is_superuser:
+    staff = get_object_or_404(Staff, staff_id=staff_id)
+    old_department = staff.department
+    user = request.user
+
+    if user.is_superuser:
+        if user.username != 'admin' and staff.department.branch_id != user.username:
+            messages.error(request, '你没有权限修改该支行的员工信息')
+            return render(request, 'frontend/error.html')
+    else:
         messages.error(request, '你没有权限修改员工信息')
         return render(request, 'frontend/error.html')
-    staff = Staff.objects.get(staff_id=staff_id)
-    old_department = staff.department
+
     if request.method != 'POST':
         form = StaffEditForm(instance=staff)
     else:
         form = StaffEditForm(instance=staff, data=request.POST, files=request.FILES)
         if form.is_valid():
-            staff.department = form.cleaned_data.get("department")
-            # if staff is the old department manager
-            # and old department is not the new department, delete the manager
-            if old_department != staff.department and Manager.objects.filter(department=old_department):
+            new_department = form.cleaned_data.get("department")
+            if old_department != new_department:
+                if user.username != 'admin' and old_department.branch_id != new_department.branch_id:
+                    messages.error(request, '你不能在不同支行之间调动员工')
+                    return render(request, 'frontend/error.html')
+
+            staff.department = new_department
+
+            if old_department != new_department and Manager.objects.filter(department=old_department, staff=staff).exists():
                 manager = Manager.objects.get(staff=staff, department=old_department)
                 manager.delete()
-            staff.name = form.cleaned_data.get("name")
-            staff.tel = form.cleaned_data.get("tel")
-            staff.address = form.cleaned_data.get("address")
-            if 'photo' in request.FILES:
-                # if old photo is not default photo, then delete old photo
-                if staff.photo and staff.photo.name != 'photos/20230601/default.png':
-                    staff.photo.delete()
-                staff.photo = form.cleaned_data.get("photo")
-            staff.save()
+
+            form.save()
             return redirect('staffs:staffs')
+
     context = {'form': form, 'staff': staff}
     return render(request, 'staffs/edit_staff.html', context)
 
-
+@login_required
 def delete_staff(request, staff_id):
-    # judge if user is superuser
-    if not request.user.is_superuser:
+    staff = get_object_or_404(Staff, staff_id=staff_id)
+    user = request.user
+
+    if user.is_superuser:
+        if user.username != 'admin' and staff.department.branch_id != user.username:
+            messages.error(request, '你没有权限删除该支行的员工信息')
+            return render(request, 'frontend/error.html')
+    else:
         messages.error(request, '你没有权限删除员工')
         return render(request, 'frontend/error.html')
-    staff = Staff.objects.get(staff_id=staff_id)
-    # if staff is a manager, delete it
-    if Manager.objects.filter(staff=staff):
+
+    if Manager.objects.filter(staff=staff).exists():
         manager = Manager.objects.get(staff=staff)
         manager.delete()
-    # if staff photo is not the default photo, delete staff photo
+
     if staff.photo and staff.photo.name != 'photos/20230601/default.png':
         staff.photo.delete()
+
     staff.delete()
     return redirect('staffs:staffs')
 
-
+@login_required
 def set_manager(request, staff_id, department_id):
     name = None
     if request.user.is_superuser:
@@ -123,7 +147,7 @@ def set_manager(request, staff_id, department_id):
     manager.save()
     return redirect('departments:departments')
 
-
+@login_required
 def delete_manager(request, department_id):
     # judge if user is superuser
     if not request.user.is_superuser:
