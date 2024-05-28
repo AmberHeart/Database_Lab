@@ -10,7 +10,7 @@ class Staff(models.Model):
     name = models.CharField(max_length=20)
     tel = models.CharField(max_length=11)
     address = models.CharField(max_length=100)
-    photo = models.ImageField(upload_to='photos/%Y%m%d/', default='photos/20230601/default.png')
+    photo = models.ImageField(upload_to='photos/%Y%m%d/', default='photos/default.png')
 
     def __str__(self):
         return f"{self.staff_id}-{self.name}"
