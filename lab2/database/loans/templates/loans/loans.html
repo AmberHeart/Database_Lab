@@ -4,10 +4,12 @@
 {% block page_header %}
 <div class="text-center my-4">
     <h2 class="text-white">贷款信息</h2>
+    {% if not user.is_staff and not user.is_superuser %}
     <p class="text-white">
         身份证号码：{{ loan_user.id }}，客户名：{{ loan_user.name }}，电话：{{ loan_user.tel }}，
         家庭住址：{{ loan_user.address }}，账户数量：{{ loan_user.counts }}
     </p>
+    {% endif %}
 </div>
 {% endblock page_header %}
 
@@ -20,21 +22,29 @@
                 <h4 class="card-header">
                     <a class="text-white">贷款号：{{ loan.loan_id }}</a>
                     <span class="text-muted" style="float: right;">
+                        {% if user.is_staff or user.is_superuser %}
+                        <a href="{% url 'loans:approve_loan' loan.loan_id %}" class="btn btn-outline-success ml-2">审批贷款</a>
+                        {% endif %}
                         <a href="{% url 'loans:delete_loan' loan.loan_id %}" class="btn btn-outline-danger">删除贷款</a>
                     </span>
                 </h4>
                 <div class="card-body">
-                    <p class="card-text">申请人：{{ loan.user.name }}</p>
                     <p class="card-text">贷款金额：{{ loan.money|floatformat:2 }}</p>
                     <p class="card-text">批准银行：{{ loan.branch.name }}</p>
                     <p class="card-text">申请时间：{{ loan.loan_date|date:'Y-m-d, H:i' }}</p>
-                    <p class="card-text">还款期限：{{ loan.due_date|date:'Y-m-d, H:i' }}</p>
+                    <p class="card-text">还款期限：{{ loan.due_date|date:'Y-m-d' }}</p>
                     <p class="card-text">未还金额：{{ loan.remain_money|floatformat:2 }}</p>
                     <p class="card-text">贷款状态：{{ loan.status }}</p>
+                    <p class="card-text">审批状态：{{ loan.apply_status }}</p>
+                    {% if not user.is_staff and not user.is_superuser %}
+                    <p class="card-text">申请人：{{ loan.user.name }}</p>
+                    {% endif %}
                 </div>
+                {% if loan.apply_status == "批准" and loan.status == "未还清" %}
                 <div class="card-footer">
                     <a href="{% url 'loans:pay_loan' loan.loan_id %}" class="btn btn-outline-light">还款</a>
                 </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}

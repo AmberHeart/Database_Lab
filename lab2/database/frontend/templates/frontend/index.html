@@ -8,76 +8,84 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        {% if user.is_superuser %}
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-secondary">
-                <div class="card-header">客户管理</div>
-                <div class="card-body">
-                    <h5 class="card-title">查看和管理客户信息</h5>
-                    <p class="card-text">查看所有客户信息，添加或修改客户数据。</p>
-                    <a href="{% url 'users:get_users' %}" class="btn btn-dark">进入客户管理</a>
+        {% if user.is_authenticated %}
+            {% if user.is_superuser %}
+            <div class="col-md-4 mb-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-header">客户管理</div>
+                    <div class="card-body">
+                        <h5 class="card-title">查看和管理客户信息</h5>
+                        <p class="card-text">查看所有客户信息，添加或修改客户数据。</p>
+                        <a href="{% url 'users:get_users' %}" class="btn btn-dark">进入客户管理</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-secondary">
-                <div class="card-header">员工管理</div>
-                <div class="card-body">
-                    <h5 class="card-title">查看和管理员工信息</h5>
-                    <p class="card-text">查看所有员工信息，添加或修改员工数据。</p>
-                    <a href="{% url 'staffs:staffs' %}" class="btn btn-dark">进入员工管理</a>
+            <div class="col-md-4 mb-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-header">员工管理</div>
+                    <div class="card-body">
+                        <h5 class="card-title">查看和管理员工信息</h5>
+                        <p class="card-text">查看所有员工信息，添加或修改员工数据。</p>
+                        <a href="{% url 'staffs:staffs' %}" class="btn btn-dark">进入员工管理</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-secondary">
-                <div class="card-header">贷款管理</div>
-                <div class="card-body">
-                    <h5 class="card-title">查看和管理贷款信息</h5>
-                    <p class="card-text">查看所有贷款信息，处理贷款申请。</p>
-                    <a href="{% url 'loans:branch_loans' %}" class="btn btn-dark">进入贷款管理</a>
+            <div class="col-md-4 mb-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-header">贷款管理</div>
+                    <div class="card-body">
+                        <h5 class="card-title">查看和管理贷款信息</h5>
+                        <p class="card-text">查看所有贷款信息，处理贷款申请。</p>
+                        <a href="{% url 'loans:branch_loans' %}" class="btn btn-dark">进入贷款管理</a>
+                    </div>
                 </div>
             </div>
-        </div>
+            {% else %}
+            <div class="col-md-6 mb-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-header">账户信息</div>
+                    <div class="card-body">
+                        <h5 class="card-title">查看账户信息</h5>
+                        <p class="card-text">查看和管理您的账户信息。</p>
+                        <a href="{% url 'accounts:accounts' user.id %}" class="btn btn-dark">查看账户</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-header">贷款信息</div>
+                    <div class="card-body">
+                        <h5 class="card-title">查看贷款信息</h5>
+                        <p class="card-text">查看和管理您的贷款信息。</p>
+                        <a href="{% url 'loans:loans' user.id %}" class="btn btn-dark">查看贷款</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-header">申请贷款</div>
+                    <div class="card-body">
+                        <h5 class="card-title">申请新的贷款</h5>
+                        <p class="card-text">提交新的贷款申请。</p>
+                        <a href="{% url 'loans:apply_loan' user.id %}" class="btn btn-dark">申请贷款</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card text-white bg-secondary">
+                    <div class="card-header">创建账户</div>
+                    <div class="card-body">
+                        <h5 class="card-title">创建新的账户</h5>
+                        <p class="card-text">开设新的银行账户。</p>
+                        <a href="{% url 'accounts:create_account' user.id %}" class="btn btn-dark">创建账户</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         {% else %}
-        <div class="col-md-6 mb-4">
-            <div class="card text-white bg-secondary">
-                <div class="card-header">账户信息</div>
-                <div class="card-body">
-                    <h5 class="card-title">查看账户信息</h5>
-                    <p class="card-text">查看和管理您的账户信息。</p>
-                    <a href="{% url 'accounts:accounts' user.id %}" class="btn btn-dark">查看账户</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card text-white bg-secondary">
-                <div class="card-header">贷款信息</div>
-                <div class="card-body">
-                    <h5 class="card-title">查看贷款信息</h5>
-                    <p class="card-text">查看和管理您的贷款信息。</p>
-                    <a href="{% url 'loans:loans' user.id %}" class="btn btn-dark">查看贷款</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card text-white bg-secondary">
-                <div class="card-header">申请贷款</div>
-                <div class="card-body">
-                    <h5 class="card-title">申请新的贷款</h5>
-                    <p class="card-text">提交新的贷款申请。</p>
-                    <a href="{% url 'loans:apply_loan' user.id %}" class="btn btn-dark">申请贷款</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card text-white bg-secondary">
-                <div class="card-header">创建账户</div>
-                <div class="card-body">
-                    <h5 class="card-title">创建新的账户</h5>
-                    <p class="card-text">开设新的银行账户。</p>
-                    <a href="{% url 'accounts:create_account' user.id %}" class="btn btn-dark">创建账户</a>
-                </div>
+        <div class="col-md-6 offset-md-3">
+            <div class="alert alert-warning text-center" role="alert">
+                您还没有登录，请先登录以访问更多功能。
             </div>
         </div>
         {% endif %}

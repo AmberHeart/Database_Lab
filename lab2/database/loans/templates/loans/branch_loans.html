@@ -15,9 +15,11 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title">贷款号：{{ loan.loan_id }}</h5>
+                    {% if request.user.is_superuser %}
                     <span class="text-muted float-right">
                         <a href="{% url 'loans:delete_loan' loan.loan_id %}" class="btn btn-outline-danger">删除贷款</a>
                     </span>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <p class="card-text">申请人：{{ loan.user.name }}</p>
@@ -27,6 +29,15 @@
                     <p class="card-text">还款期限：{{ loan.due_date|date:'Y-m-d, H:i' }}</p>
                     <p class="card-text">未还金额：{{ loan.remain_money|floatformat:2 }}</p>
                     <p class="card-text">贷款状态：{{ loan.status }}</p>
+                    <p class="card-text">申请状态：{{ loan.apply_status }}</p>
+                </div>
+                <div class="card-footer">
+                    {% if loan.apply_status == '未审批' and request.user.is_staff %}
+                        <a href="{% url 'loans:approve_loan' loan.loan_id %}" class="btn btn-outline-success">审批贷款</a>
+                    {% endif %}
+                    {% if request.user.is_superuser %}
+                        <a href="{% url 'loans:edit_loan' loan.loan_id %}" class="btn btn-outline-primary">修改贷款信息</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
