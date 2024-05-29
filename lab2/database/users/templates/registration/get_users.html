@@ -21,8 +21,8 @@
           <p class="card-text">所属分行：{{ user_info.branch_id }}</p>
       </div>
       <div class="card-footer text-muted">
-          <a href="{% url 'users:edit' user_info.user_id %}" class="btn btn-primary">修改信息</a>
-          <a href="" class="btn btn-primary">删除客户</a>
+          <a href="{% url 'users:edit' user_info.user_id %}" class="btn btn-outline-light">修改信息</a>
+          <a href="" class="btn btn-outline-light">删除客户</a>
       </div>
     </div>
 {% endfor %}
@@ -64,11 +64,3 @@
 
 
 {% endblock content %}
-
-{% if messages %}
-<script>
-    {% for msg in messages %}
-        alert('{{ msg.message }}');
-    {% endfor %}
-</script>
-{% endif %}

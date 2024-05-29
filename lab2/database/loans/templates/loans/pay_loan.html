@@ -2,16 +2,24 @@
 {% load bootstrap4 %}
 
 {% block page_header %}
-  <h2 align="center">还清贷款</h2>
+<div class="text-center my-4">
+    <h2 class="text-white">还清贷款</h2>
+</div>
 {% endblock page_header %}
 
 {% block content %}
-<form method="post" action="{% url 'loans:pay_loan' loan.loan_id %}" class="form">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% buttons %}
-    <button name="submit" class="btn btn-primary">还款</button>
-    {% endbuttons %}
-    <input type="hidden" name="next" value="{% url 'loans:loans' user.id %}">
-</form>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post" action="{% url 'loans:pay_loan' loan.loan_id %}" class="form">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-outline-light">还款</button>
+                </div>
+                <input type="hidden" name="next" value="{% url 'loans:loans' user.id %}">
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock content %}

@@ -3,62 +3,105 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device=width, initial-sacle=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>银行</title>
-
     {% bootstrap_css %}
-    {% bootstrap_javascript jquery='fill' %}
+    {% bootstrap_javascript jquery='full' %}
+    <style>
+        body {
+            background-color: #343a40;
+            color: #f8f9fa;
+        }
+        .navbar {
+            margin-bottom: 1rem;
+        }
+        .card, .dropdown-menu {
+            background-color: #495057;
+            color: #f8f9fa;
+        }
+        .card a, .dropdown-item {
+            color: #f8f9fa;
+        }
+        .card-footer {
+            background-color: #343a40;
+        }
+        .footer {
+            background-color: #343a40;
+        }
+    </style>
 </head>
-
 <body>
-<nav class="navbar navbar-expand-md navbar-light bg-light mb-4 border ">
-    <a class="navbar-brand" href="{% url 'frontend:index' %}">银行</a>
-    <a class="navbar-brand" href="{% url 'branches:branches' %}">支行</a>
-    <a class="navbar-brand" href="{% url 'departments:departments' %}">部门</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarCollapse" aria-controls="navbarCollapse"
-            aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 border">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'frontend:index' %}">首页</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarCollapse" aria-controls="navbarCollapse"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav ml-auto">
-            {% if user.is_authenticated %}
-            <li class="nav-item dropdown">
-                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
-                     {{ user.username }}
-                 </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'branches:branches' %}">支行</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'departments:departments' %}">部门</a>
+                </li>
+                {% if user.is_authenticated %}
                     {% if user.is_superuser %}
-                        <a class="dropdown-item" href="/admin">系统后台</a>
-                        <a class="dropdown-item" href="{% url 'users:get_users' %}">客户信息</a>
-                        <a class="dropdown-item" href="{% url 'staffs:staffs' %}">员工信息</a>
-                        <a class="dropdown-item" href="{% url 'loans:branch_loans' %}">贷款信息</a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'users:get_users' %}">客户信息</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'staffs:staffs' %}">员工信息</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'loans:branch_loans' %}">贷款信息</a>
+                        </li>
                     {% else %}
-                        <a class="dropdown-item" href="{% url 'accounts:accounts' user.id %}">账户信息</a>
-                        <a class="dropdown-item" href="{% url 'loans:loans' user.id %}">贷款信息</a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:accounts' user.id %}">账户信息</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'loans:loans' user.id %}">贷款信息</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:create_account' user.id %}">创建账户</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'loans:apply_loan' user.id %}">申请贷款</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" href="{% url 'users:edit' user.id %}">修改信息</a>
                         <a class="dropdown-item" href="{% url 'users:change_pwd' user.id %}">修改密码</a>
-                        <a class="dropdown-item" href="{% url 'accounts:create_account' user.id %}">创建账户</a>
-                        <a class="dropdown-item" href="{% url 'loans:apply_loan' user.id %}">申请贷款</a>
-                    {% endif %}
-                    <div class="dropdown-divider"></div>
-                    <form id="logout-form" method="POST" action="{% url 'users:logout' %}" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="dropdown-item">退出</button>
-                    </form>
-                </div>
-            </li>
-            {% else %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:login' %}">登录</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:register' %}">注册</a>
-            </li>
-            {% endif %}
-        </ul>
+                        <div class="dropdown-divider"></div>
+                        <form id="logout-form" method="POST" action="{% url 'users:logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">退出</button>
+                        </form>
+                    </div>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:login' %}">登录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:register' %}">注册</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </nav>
 
@@ -71,17 +114,14 @@
     </div>
 </main>
 
-<footer class="container-fluid bg-light pt-3" style="position: fixed; bottom: 0; left: 0; right: 0;">
+<footer class="footer container-fluid bg-dark pt-3" style="position: fixed; bottom: 0; left: 0; right: 0;">
     <div class="container">
-        <p align="center">
+        <p class="text-center mb-0">
             <small>&copy;
-            <a href="https://github.com/AmberHeart/Database_Lab" style="color: black;">https://github.com/AmberHeart/Database_Lab</a>
+            <a href="https://github.com/AmberHeart/Database_Lab" style="color: #f8f9fa;">https://github.com/AmberHeart/Database_Lab</a>
             </small>
         </p>
     </div>
 </footer>
-
 </body>
 </html>
-<!---->
-<!---->

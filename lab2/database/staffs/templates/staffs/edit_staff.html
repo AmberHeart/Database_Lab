@@ -2,19 +2,31 @@
 {% load bootstrap4 %}
 
 {% block page_header %}
-  <h2 align="center">修改员工个人信息</h2>
+<div class="text-center my-4">
+    <h2 class="text-white">修改员工个人信息</h2>
+</div>
 {% endblock page_header %}
 
 {% block content %}
-<form method="post" action="{% url 'staffs:edit_staff' staff.staff_id %}" class="form" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% if staff.photo %}
-        <img src="{{ staff.photo.url }}" style="width: 150px; height: auto;">
-    {% endif %}
-    {% buttons %}
-    <button name="submit" class="btn btn-primary">确认修改</button>
-    {% endbuttons %}
-    <input type="hidden" name="next" value="{% url 'staffs:staffs' %}">
-</form>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post" action="{% url 'staffs:edit_staff' staff.staff_id %}" class="form" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% if staff.photo %}
+                <div class="text-center mb-3">
+                    <img src="{{ staff.photo.url }}" class="img-fluid" style="max-width: 200px;">
+                </div>
+                {% endif %}
+                <div class="text-center">
+                    {% buttons %}
+                    <button name="submit" class="btn btn-outline-light">确认修改</button>
+                    {% endbuttons %}
+                </div>
+                <input type="hidden" name="next" value="{% url 'staffs:staffs' %}">
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock content %}
