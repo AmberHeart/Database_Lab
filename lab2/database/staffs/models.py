@@ -11,7 +11,7 @@ class Staff(models.Model):
     name = models.CharField(max_length=20)
     tel = models.CharField(max_length=11)
     address = models.CharField(max_length=100)
-    photo = models.ImageField(upload_to='photos/%Y%m%d/', default='photos/default.png')
+    photo = models.ImageField(upload_to='photos/%Y%m%d/', default='photos/default.jpg')
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

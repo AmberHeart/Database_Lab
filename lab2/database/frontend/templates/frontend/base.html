@@ -2,24 +2,24 @@
 
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>银行</title>
-    {% bootstrap_css %}
-    {% bootstrap_javascript jquery='full' %}
-    <style>
-        body {
-            background-color: #343a40;
-            color: #f8f9fa;
-        }
-        .navbar {
-            margin-bottom: 1rem;
-        }
-        .card, .dropdown-menu {
-            background-color: #495057;
-            color: #f8f9fa;
-        }
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>银行</title>
+        {% bootstrap_css %}
+        {% bootstrap_javascript jquery='full' %}
+        <style>
+            body {
+                background-color: #343a40;
+                color: #f8f9fa;
+            }
+            .navbar {
+                margin-bottom: 1rem;
+            }
+            .card, .dropdown-menu {
+                background-color: #495057;
+                color: #f8f9fa;
+            }
         .card a, .dropdown-item {
             color: #f8f9fa;
         }
@@ -29,18 +29,18 @@
         .footer {
             background-color: #343a40;
         }
-    </style>
+        </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 border">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'frontend:index' %}">首页</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarCollapse" aria-controls="navbarCollapse"
-                aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 border">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'frontend:index' %}">首页</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarCollapse" aria-controls="navbarCollapse"
+            aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
+        
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
@@ -50,30 +50,30 @@
                     <a class="nav-link" href="{% url 'departments:departments' %}">部门</a>
                 </li>
                 {% if user.is_authenticated %}
-                    {% if user.is_superuser %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:get_users' %}">客户信息</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'staffs:staffs' %}">员工信息</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'loans:branch_loans' %}">贷款信息</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:accounts' user.id %}">账户信息</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'loans:loans' user.id %}">贷款信息</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:create_account' user.id %}">创建账户</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'loans:apply_loan' user.id %}">申请贷款</a>
-                        </li>
-                    {% endif %}
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:get_users' %}">客户信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'staffs:staffs' %}">员工信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'loans:branch_loans' %}">贷款信息</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:accounts' user.id %}">账户信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'loans:loans' user.id %}">贷款信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:create_account' user.id %}">创建账户</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'loans:apply_loan' user.id %}">申请贷款</a>
+                </li>
+                {% endif %}
                 {% endif %}
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -110,6 +110,16 @@
     </div>
 </nav>
 
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <main role="main" class="container" style="min-height: calc(100vh - 70px); margin-bottom: 70px;">
     <div class="pb-2 mb-2 border-bottom">
         {% block page_header %}{% endblock page_header %}
@@ -123,7 +133,7 @@
     <div class="container">
         <p class="text-center mb-0">
             <small>&copy;
-            <a href="https://github.com/AmberHeart/Database_Lab" style="color: #f8f9fa;">https://github.com/AmberHeart/Database_Lab</a>
+                <a href="https://github.com/AmberHeart/Database_Lab" style="color: #f8f9fa;">https://github.com/AmberHeart/Database_Lab</a>
             </small>
         </p>
     </div>
@@ -131,12 +141,3 @@
 </body>
 </html>
 
-{% if messages %}
-<div class="container mt-3">
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
-</div>
-{% endif %}

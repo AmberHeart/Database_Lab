@@ -89,7 +89,15 @@ def edit_staff(request, staff_id):
                 manager = Manager.objects.get(staff=staff, department=old_department)
                 manager.delete()
 
-            form.save()
+            form.cleaned_data.get("name")
+            staff.tel = form.cleaned_data.get("tel")
+            staff.address = form.cleaned_data.get("address")
+            if 'photo' in request.FILES:
+                # if old photo is not default photo, then delete old photo
+                if staff.photo and staff.photo.name != 'photos/default.jpg':
+                    staff.photo.delete()
+                staff.photo = form.cleaned_data.get("photo")
+            staff.save()
             return redirect('staffs:staffs')
 
     context = {'form': form, 'staff': staff}
@@ -112,7 +120,7 @@ def delete_staff(request, staff_id):
         manager = Manager.objects.get(staff=staff)
         manager.delete()
 
-    if staff.photo and staff.photo.name != 'photos/20230601/default.png':
+    if staff.photo and staff.photo.name != 'photos/default.jpg':
         staff.photo.delete()
 
     staff.delete()

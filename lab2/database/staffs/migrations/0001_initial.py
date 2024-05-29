@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=20)),
                 ('tel', models.CharField(max_length=11)),
                 ('address', models.CharField(max_length=100)),
-                ('photo', models.ImageField(default='photos/default.png', upload_to='photos/%Y%m%d/')),
+                ('photo', models.ImageField(default='photos/default.jpg', upload_to='photos/%Y%m%d/')),
                 ('branch', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='BranchStaff', to='branch.bankbranch')),
             ],
         ),

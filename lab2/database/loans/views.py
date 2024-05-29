@@ -45,17 +45,35 @@ def apply_loan(request, user_id):
 def delete_loan(request, loan_id):
     loan = Loans.objects.get(loan_id=loan_id)
     user = BankUser.objects.get(id=loan.user_id)
-    if request.user.id != user.user_id:
-        messages.error(request, '无法删除他人贷款')
-        return render(request, 'frontend/error.html')
-    if not loan or loan.status == '未还清':
-        messages.error(request, '未还清贷款，无法删除贷款')
-        return render(request, 'frontend/error.html')
-    loan.delete()
-    if not Loans.objects.filter(user_id=user.id):
-        user.status = True
-        user.save()
-    return redirect('loans:loans', user_id=user.user_id)
+    if request.user.is_superuser:
+        loan.delete()
+        messages.success(request, '贷款已删除')
+        return redirect('loans:branch_loans')
+    elif request.user.is_staff:
+        if request.user.branch_id == loan.branch.branch_id:
+            loan.delete()
+            messages.success(request, '贷款已删除')
+            return redirect('loans:branch_loans')
+        else:
+            messages.error(request, '无权删除此贷款')
+            return render(request, 'frontend/error.html')
+    else:
+        if request.user.id != user.user_id:
+            messages.error(request, '无法删除他人贷款')
+            return render(request, 'frontend/error.html')
+        if loan.apply_status == '未审批':
+            loan.delete()
+            messages.success(request, '贷款已删除')
+            return redirect('loans:loans', user_id=user.user_id)
+        elif loan.status == '未还清':
+            messages.error(request, '贷款未还清，无法删除')
+            return render(request, 'frontend/error.html')
+        if loan.status == '已还清':
+            loan.delete()
+            messages.success(request, '贷款已删除')
+            return redirect('loans:loans', user_id=user.user_id)
+        
+
 
 @login_required
 def pay_loan(request, loan_id):
