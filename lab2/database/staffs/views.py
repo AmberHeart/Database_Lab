@@ -18,7 +18,7 @@ def staffs(request):
         else:
             staffs_lists = Staff.objects.filter(department__branch_id=user.username)
     else:
-        messages.error(request, '你没有权限查看员工信息')
+        messages.warning(request, '你没有权限查看员工信息')
         return render(request, 'frontend/error.html')
 
     paginator = Paginator(staffs_lists, 4)
@@ -35,11 +35,11 @@ def create_staff(request, department_id):
         name = request.user.username
     branch = BranchDepartments.objects.get(department_id=department_id).branch_id
     if not (name and name == branch or name == 'admin'):
-        messages.error(request, '你没有权限操作该部门')
+        messages.warning(request, '你没有权限操作该部门')
         return render(request, 'frontend/error.html')
     # judge if user is superuser
     if not request.user.is_superuser:
-        messages.error(request, '你没有权限创建员工')
+        messages.warning(request, '你没有权限创建员工')
         return render(request, 'frontend/error.html')
     department = BranchDepartments.objects.get(department_id=department_id)
     if request.method != 'POST':
@@ -66,10 +66,10 @@ def edit_staff(request, staff_id):
 
     if user.is_superuser:
         if user.username != 'admin' and staff.department.branch_id != user.username:
-            messages.error(request, '你没有权限修改该支行的员工信息')
+            messages.warning(request, '你没有权限修改该支行的员工信息')
             return render(request, 'frontend/error.html')
     else:
-        messages.error(request, '你没有权限修改员工信息')
+        messages.warning(request, '你没有权限修改员工信息')
         return render(request, 'frontend/error.html')
 
     if request.method != 'POST':
@@ -80,7 +80,7 @@ def edit_staff(request, staff_id):
             new_department = form.cleaned_data.get("department")
             if old_department != new_department:
                 if user.username != 'admin' and old_department.branch_id != new_department.branch_id:
-                    messages.error(request, '你不能在不同支行之间调动员工')
+                    messages.warning(request, '你不能在不同支行之间调动员工')
                     return render(request, 'frontend/error.html')
 
             staff.department = new_department
@@ -110,10 +110,10 @@ def delete_staff(request, staff_id):
 
     if user.is_superuser:
         if user.username != 'admin' and staff.department.branch_id != user.username:
-            messages.error(request, '你没有权限删除该支行的员工信息')
+            messages.warning(request, '你没有权限删除该支行的员工信息')
             return render(request, 'frontend/error.html')
     else:
-        messages.error(request, '你没有权限删除员工')
+        messages.warning(request, '你没有权限删除员工')
         return render(request, 'frontend/error.html')
 
     if Manager.objects.filter(staff=staff).exists():
@@ -133,17 +133,17 @@ def set_manager(request, staff_id, department_id):
         name = request.user.username
     branch = BranchDepartments.objects.get(department_id=department_id).branch_id
     if not (name and name == branch or name == 'admin'):
-        messages.error(request, '你没有权限操作该部门')
+        messages.warning(request, '你没有权限操作该部门')
         return render(request, 'frontend/error.html')
     # judge if user is superuser
     if not request.user.is_superuser:
-        messages.error(request, '你没有权限设置经理')
+        messages.warning(request, '你没有权限设置经理')
         return render(request, 'frontend/error.html')
     staff = Staff.objects.get(staff_id=staff_id)
     department = BranchDepartments.objects.get(department_id=department_id)
 
     if staff.department != department:
-        messages.error(request, '员工不在该部门, 不能设置为经理')
+        messages.warning(request, '员工不在该部门, 不能设置为经理')
         return render(request, 'frontend/error.html')
 
     # if there is a manager in this department, delete it
@@ -159,7 +159,7 @@ def set_manager(request, staff_id, department_id):
 def delete_manager(request, department_id):
     # judge if user is superuser
     if not request.user.is_superuser:
-        messages.error(request, '你没有权限删除经理')
+        messages.warning(request, '你没有权限删除经理')
         return render(request, 'frontend/error.html')
     department = BranchDepartments.objects.get(department_id=department_id)
     # if there is a manager in this department, delete it

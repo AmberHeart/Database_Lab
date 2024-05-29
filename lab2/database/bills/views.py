@@ -15,7 +15,7 @@ def create_bill(request, account_id):
     # judge if the user is the owner of the account
     user_id = BankUser.objects.get(id=account.user_id).user_id
     if request.user.id != user_id:
-        messages.error(request, '无法为他人账户创建账单')
+        messages.warning(request, '无法为他人账户创建账单')
         return render(request, 'frontend/error.html')
     if request.method != 'POST':
         form = AccountBillsForm(initial={'account': account})
@@ -28,7 +28,7 @@ def create_bill(request, account_id):
             remark = form.cleaned_data.get("remark")
             new_money = old_money + changes
             if new_money < 0:
-                messages.error(request, '余额不足')
+                messages.warning(request, '余额不足')
                 return render(request, 'frontend/error.html')
             bill = AccountBills.objects.create(account=account, changes=changes,
                                                type=bill_type, remark=remark, money=new_money)
@@ -47,7 +47,7 @@ def bills(request, account_id):
     # judge if the user is the owner of the account
     user_id = BankUser.objects.get(id=account.user_id).user_id
     if request.user.id != user_id:
-        messages.error(request, '无法查看他人账单')
+        messages.warning(request, '无法查看他人账单')
         return render(request, 'frontend/error.html')
     bills_lists = AccountBills.objects.filter(account_id=account_id)
     paginator = Paginator(bills_lists, 4)

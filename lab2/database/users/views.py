@@ -40,7 +40,7 @@ def bank_user_register(request):
             id = register_form.cleaned_data.get("id")
             # # check if there is id
             # if BankUser.objects.filter(id=id):
-            #     messages.error(request, '该身份证号码已被注册')
+            #     messages.warning(request, '该身份证号码已被注册')
             #     return render(request, 'frontend/error.html')
             user = User.objects.create_user(username=username, password=password)
             name = register_form.cleaned_data.get("name")
@@ -65,7 +65,7 @@ def change_pwd(request, user_id):
     # judge if the user is the owner
     user = User.objects.get(id=user_id)
     if user != request.user:
-        messages.error(request, '无法修改他人密码')
+        messages.warning(request, '无法修改他人密码')
         return render(request, 'frontend/error.html')
     if request.method != 'POST':
         form = PasswordChangeForm(user=request.user)
@@ -85,7 +85,7 @@ def bank_user_edit(request, user_id):
     user = User.objects.get(id=user_id)
     info = BankUser.objects.get(user_id=user_id)
     if user != request.user and not request.user.is_superuser:
-        messages.error(request, '无法修改他人信息')
+        messages.warning(request, '无法修改他人信息')
         return render(request, 'frontend/error.html')
 
     if request.method != 'POST':
@@ -115,13 +115,16 @@ def get_users(request):
         else:
             users_lists = BankUser.objects.filter(branch=user_name)
 
+        # user_lists中去除超级用户 .
+        users_lists = users_lists.exclude(user__is_superuser=True)
+
         paginator = Paginator(users_lists, 4)
         page = request.GET.get('page')
         users = paginator.get_page(page)
         context = {'users': users}
         return render(request, 'registration/get_users.html', context)
     else:
-        messages.error(request, '无法查看信息')
+        messages.warning(request, '无法查看信息')
         return render(request, 'frontend/error.html')
 
 @login_required

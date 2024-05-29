@@ -14,7 +14,7 @@ def departments(request):
         else:
             departments_lists = BranchDepartments.objects.filter(branch_id=user_name)
     else:
-        messages.error(request, '无法查看部门信息')
+        messages.warning(request, '无法查看部门信息')
         return render(request, 'frontend/error.html')
 
     paginator = Paginator(departments_lists, 4)
@@ -44,9 +44,9 @@ def department_staffs(request, department_id):
             context = {'staffs': staffs_list}
             return render(request, 'departments/staffs.html', context)
         else:
-            messages.error(request, '你没有权限查看该部门员工')
+            messages.warning(request, '你没有权限查看该部门员工')
             return render(request, 'frontend/error.html')
     else:
-        messages.error(request, '无法查看员工信息')
+        messages.warning(request, '无法查看员工信息')
         return render(request, 'frontend/error.html')
 

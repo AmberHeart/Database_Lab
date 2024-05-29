@@ -15,7 +15,7 @@ from django.utils import timezone
 def apply_loan(request, user_id):
     user = BankUser.objects.get(user_id=user_id)
     if request.user.id != user_id:
-        messages.error(request, '无法为他人创建账户')
+        messages.warning(request, '无法为他人创建账户')
         return render(request, 'frontend/error.html')
     branch = BankBranch.objects.get(name=user.branch_id)
     if request.method != 'POST':
@@ -29,7 +29,7 @@ def apply_loan(request, user_id):
             # Check if due_date is at least one month from now
             now = timezone.now()
             if due_date <= now + timedelta(days=30):
-                messages.error(request, '还款期限必须至少比申请时间长1个月')
+                messages.warning(request, '还款期限必须至少比申请时间长1个月')
                 return render(request, 'frontend/error.html')
             else:
                 loan = Loans.objects.create(user=user, branch=branch, money=money, remain_money=money, due_date=due_date)
@@ -55,19 +55,19 @@ def delete_loan(request, loan_id):
             messages.success(request, '贷款已删除')
             return redirect('loans:branch_loans')
         else:
-            messages.error(request, '无权删除此贷款')
+            messages.warning(request, '无权删除此贷款')
             return render(request, 'frontend/error.html')
     else:
         if request.user.id != user.user_id:
-            messages.error(request, '无法删除他人贷款')
+            messages.warning(request, '无法删除他人贷款')
             return render(request, 'frontend/error.html')
         if loan.apply_status == '未审批':
             loan.delete()
             messages.success(request, '贷款已删除')
             return redirect('loans:loans', user_id=user.user_id)
         elif loan.status == '未还清':
-            messages.error(request, '贷款未还清，无法删除')
-            return render(request, 'frontend/error.html')
+            messages.warning(request, '贷款未还清，无法删除')
+            return redirect('loans:loans', user_id=user.user_id)
         if loan.status == '已还清':
             loan.delete()
             messages.success(request, '贷款已删除')
@@ -81,7 +81,7 @@ def pay_loan(request, loan_id):
     user = BankUser.objects.get(id=loan.user_id)
     branch = BankBranch.objects.get(name=user.branch_id)
     if request.user.id != user.user_id:
-        messages.error(request, '无法为他人还款')
+        messages.warning(request, '无法为他人还款')
         return render(request, 'frontend/error.html')
     if request.method != 'POST':
         form = PayForm(initial={'loan': loan, 'user': user, 'branch': branch})
@@ -91,11 +91,11 @@ def pay_loan(request, loan_id):
             money = form.cleaned_data.get("money")
             account = form.cleaned_data.get("account")
             if account.money < money:
-                messages.error(request, '账户余额不足')
+                messages.warning(request, '账户余额不足')
                 return render(request, 'frontend/error.html')
             loan.remain_money -= money
             if loan.remain_money < 0:
-                messages.error(request, '还款金额超过贷款金额')
+                messages.warning(request, '还款金额超过贷款金额')
                 return render(request, 'frontend/error.html')
             if loan.remain_money == 0:
                 loan.status = '已还清'
@@ -113,7 +113,7 @@ def pay_loan(request, loan_id):
 def loans(request, user_id):
     user = BankUser.objects.get(user_id=user_id)
     if request.user.id != user_id:
-        messages.error(request, '无法查看他人贷款信息')
+        messages.warning(request, '无法查看他人贷款信息')
         return render(request, 'frontend/error.html')
     loans_lists = Loans.objects.filter(user_id=user.id)
     paginator = Paginator(loans_lists, 4)
@@ -137,7 +137,7 @@ def branch_loans(request):
         context = {'loans': loans_page}
         return render(request, 'loans/branch_loans.html', context)
     else:
-        messages.error(request, '无法查看信息')
+        messages.warning(request, '无法查看信息')
         return render(request, 'frontend/error.html')
 
 @login_required
@@ -152,10 +152,10 @@ def approve_loan(request, loan_id):
                 messages.success(request, '贷款审批成功')
                 return redirect('loans:branch_loans')
             else:
-                messages.error(request, '无效的审批状态')
+                messages.warning(request, '无效的审批状态')
         return render(request, 'loans/approve_loan.html', {'loan': loan})
     else:
-        messages.error(request, '无权限审批贷款')
+        messages.warning(request, '无权限审批贷款')
         return render(request, 'frontend/error.html')
 
 @login_required
@@ -163,7 +163,7 @@ def edit_loan(request, loan_id):
     loan = get_object_or_404(Loans, loan_id=loan_id)
     
     if not request.user.is_superuser and request.user.branch_id != loan.branch.branch_id:
-        messages.error(request, '无权编辑此贷款信息')
+        messages.warning(request, '无权编辑此贷款信息')
         return redirect('loans:branch_loans')
 
     if request.method == 'POST':

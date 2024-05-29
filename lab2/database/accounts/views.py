@@ -15,7 +15,7 @@ from django.core.paginator import Paginator
 def create_account(request, user_id):
     user = BankUser.objects.get(user_id=user_id)
     if request.user.id != user_id:
-        messages.error(request, '无法为他人创建账户')
+        messages.warning(request, '无法为他人创建账户')
         return render(request, 'frontend/error.html')
     branch = BankBranch.objects.get(name=user.branch_id)
     if request.method != 'POST':
@@ -45,10 +45,10 @@ def delete_account(request, account_id):
     user = BankUser.objects.get(id=account.user_id)
     # judge if the user is the owner of the account
     if request.user.id != user.user_id:
-        messages.error(request, '无法删除他人账户')
+        messages.warning(request, '无法删除他人账户')
         return render(request, 'frontend/error.html')
     if not account or account.money > 0:
-        messages.error(request, '无法删除账户')
+        messages.warning(request, '无法删除账户')
         return render(request, 'frontend/error.html')
     # 触发器，自动更新用户的账户数
     user.counts = user.counts - 1
@@ -62,7 +62,7 @@ def delete_account(request, account_id):
 def accounts(request, user_id):
     # judge if the user is the owner of the account
     if request.user.id != user_id and not request.user.is_superuser:
-        messages.error(request, '无法查看他人账户')
+        messages.warning(request, '无法查看他人账户')
         return render(request, 'frontend/error.html')
     account_user = BankUser.objects.get(user_id=user_id)
     accounts_lists = UserAccounts.objects.filter(user_id=account_user.id)
@@ -80,7 +80,7 @@ def transfer(request, account_id):
     user = BankUser.objects.get(id=account.user_id)
     # judge if the user is the owner of the account
     if request.user.id != user.user_id:
-        messages.error(request, '无法使用他人账户')
+        messages.warning(request, '无法使用他人账户')
         return render(request, 'frontend/error.html')
     if request.method != 'POST':
         form = AccountsTransferForm(initial={'account': account})
@@ -91,11 +91,11 @@ def transfer(request, account_id):
             target_account = form.cleaned_data.get("target_account")
             # check if the account has enough money
             if account.money < money:
-                messages.error(request, '余额不足')
+                messages.warning(request, '余额不足')
                 return render(request, 'frontend/error.html')
             # check if the target account exists
             if not UserAccounts.objects.filter(account_id=target_account.account_id):
-                messages.error(request, '目标账户不存在')
+                messages.warning(request, '目标账户不存在')
                 return render(request, 'frontend/error.html')
             account.money = account.money - money
             account.save()
