@@ -61,7 +61,7 @@ def delete_loan(request, loan_id):
         if request.user.id != user.user_id:
             messages.warning(request, '无法删除他人贷款')
             return render(request, 'frontend/error.html')
-        if loan.apply_status == '未审批':
+        if loan.apply_status == '未审批' or loan.apply_status == '拒绝':
             loan.delete()
             messages.success(request, '贷款已删除')
             return redirect('loans:loans', user_id=user.user_id)

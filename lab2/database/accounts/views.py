@@ -54,6 +54,7 @@ def delete_account(request, account_id):
     user.counts = user.counts - 1
     user.save()
     account.delete()
+    messages.success(request, '账户删除成功')
     return redirect('accounts:accounts', user_id=user.user_id)
 
 

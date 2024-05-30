@@ -124,6 +124,7 @@ def delete_staff(request, staff_id):
         staff.photo.delete()
 
     staff.delete()
+    messages.success(request, '员工删除成功')
     return redirect('staffs:staffs')
 
 @login_required
@@ -166,4 +167,5 @@ def delete_manager(request, department_id):
     if Manager.objects.filter(department=department):
         manager = Manager.objects.get(department=department)
         manager.delete()
+        messages.success(request, '经理取消成功')
     return redirect('departments:departments')

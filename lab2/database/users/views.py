@@ -38,10 +38,6 @@ def bank_user_register(request):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password1")
             id = register_form.cleaned_data.get("id")
-            # # check if there is id
-            # if BankUser.objects.filter(id=id):
-            #     messages.warning(request, '该身份证号码已被注册')
-            #     return render(request, 'frontend/error.html')
             user = User.objects.create_user(username=username, password=password)
             name = register_form.cleaned_data.get("name")
             tel = register_form.cleaned_data.get("tel")
@@ -53,7 +49,8 @@ def bank_user_register(request):
             login(request, user)
             return redirect('frontend:index')
         else:
-            return HttpResponse('输入不合法或该用户名/身份证号码已注册')
+            messages.warning(request, '注册信息输入不合法，请重新输入')
+            return redirect('users:register')
     elif request.method == 'GET':
         form = UserCreationForm()
         register_form = BankUserRegisterForm()
