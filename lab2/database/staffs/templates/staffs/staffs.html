@@ -3,35 +3,39 @@
 
 {% block page_header %}
 <div class="text-center my-4">
-    <h2 class="text-white">员工信息</h2>
+    <h1 class="text-white">员工信息</h1>
 </div>
 {% endblock page_header %}
 
 {% block content %}
 <div class="container">
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for staff in staffs %}
-        <div class="col-md-6">
-            <div class="card mb-3">
+        <div class="col">
+            <div class="card h-100">
                 <div class="card-body">
-                    <div class="media">
+                    <div class="d-flex align-items-center mb-3">
                         {% if staff.photo %}
-                        <img src="{{ staff.photo.url }}" class="mr-3" style="width: 150px; height: auto;">
+                        <img src="{{ staff.photo.url }}" class="rounded-circle me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary me-3" style="width: 80px; height: 80px;"></div>
                         {% endif %}
-                        <div class="media-body">
-                            <p class="card-text">姓名: {{ staff.name }}</p>
-                            <p class="card-text">部门: {{ staff.department }}</p>
-                            <p class="card-text">工号: {{ staff.staff_id }}</p>
-                            <p class="card-text">电话: {{ staff.tel }}</p>
-                            <p class="card-text">地址: {{ staff.address }}</p>
+                        <div>
+                            <h5 class="card-title mb-0">{{ staff.name }}</h5>
+                            <p class="card-text text-muted mb-0">{{ staff.department }}</p>
                         </div>
                     </div>
+                    <p class="card-text mb-1"><strong>工号:</strong> {{ staff.staff_id }}</p>
+                    <p class="card-text mb-1"><strong>电话:</strong> {{ staff.tel }}</p>
+                    <p class="card-text mb-1"><strong>地址:</strong> {{ staff.address }}</p>
                 </div>
                 {% if user.is_superuser %}
-                <div class="card-footer text-muted">
-                    <a href="{% url 'staffs:set_manager' staff.staff_id staff.department.department_id %}" class="btn btn-outline-light">设置经理</a>
-                    <a href="{% url 'staffs:edit_staff' staff.staff_id %}" class="btn btn-outline-light">修改信息</a>
-                    <a href="{% url 'staffs:delete_staff' staff.staff_id %}" class="btn btn-outline-light">删除员工</a>
+                <div class="card-footer d-flex justify-content-between">
+                    <div>
+                        <a href="{% url 'staffs:set_manager' staff.staff_id staff.department.department_id %}" class="btn btn-sm btn-outline-primary">设置经理</a>
+                        <a href="{% url 'staffs:edit_staff' staff.staff_id %}" class="btn btn-sm btn-outline-primary">修改信息</a>
+                    </div>
+                    <a href="{% url 'staffs:delete_staff' staff.staff_id %}" class="btn btn-sm btn-outline-danger">删除员工</a>
                 </div>
                 {% endif %}
             </div>
@@ -40,28 +44,29 @@
     </div>
 </div>
 
-<div class="pagination justify-content-center">
-    <ul class="pagination">
-        {% if staffs.has_previous %}
-        <li class="page-item">
-            <a href="?page=1" class="page-link">&laquo; 1</a>
-        </li>
-        <li class="page-item">
-            <a href="?page={{ staffs.previous_page_number }}" class="page-link">{{ staffs.previous_page_number }}</a>
-        </li>
-        {% endif %}
-        <li class="page-item active">
-            <span class="page-link">{{ staffs.number }}</span>
-        </li>
-        {% if staffs.has_next %}
-        <li class="page-item">
-            <a href="?page={{ staffs.next_page_number }}" class="page-link">{{ staffs.next_page_number }}</a>
-        </li>
-        <li class="page-item">
-            <a href="?page={{ staffs.paginator.num_pages }}" class="page-link">{{ staffs.paginator.num_pages }} &raquo;</a>
-        </li>
-        {% endif %}
-    </ul>
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if staffs.has_previous %}
+            <li class="page-item">
+                <a href="?page=1" class="page-link">&laquo; 1</a>
+            </li>
+            <li class="page-item">
+                <a href="?page={{ staffs.previous_page_number }}" class="page-link">{{ staffs.previous_page_number }}</a>
+            </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link">{{ staffs.number }}</span>
+            </li>
+            {% if staffs.has_next %}
+            <li class="page-item">
+                <a href="?page={{ staffs.next_page_number }}" class="page-link">{{ staffs.next_page_number }}</a>
+            </li>
+            <li class="page-item">
+                <a href="?page={{ staffs.paginator.num_pages }}" class="page-link">{{ staffs.paginator.num_pages }} &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock content %}
-

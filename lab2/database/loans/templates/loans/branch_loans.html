@@ -3,40 +3,38 @@
 
 {% block page_header %}
 <div class="text-center my-4">
-    <h2 class="text-white">贷款信息</h2>
+    <h1 class="text-white">贷款信息</h1>
 </div>
 {% endblock page_header %}
 
 {% block content %}
 <div class="container">
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for loan in loans %}
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">贷款号：{{ loan.loan_id }}</h5>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">贷款号: {{ loan.loan_id }}</h5>
                     {% if request.user.is_superuser %}
-                    <span class="text-muted float-right">
-                        <a href="{% url 'loans:delete_loan' loan.loan_id %}" class="btn btn-outline-danger">删除贷款</a>
-                    </span>
+                    <a href="{% url 'loans:delete_loan' loan.loan_id %}" class="btn btn-sm btn-outline-danger">删除贷款</a>
                     {% endif %}
                 </div>
                 <div class="card-body">
-                    <p class="card-text">申请人：{{ loan.user.name }}</p>
-                    <p class="card-text">贷款金额：{{ loan.money|floatformat:2 }}</p>
-                    <p class="card-text">批准银行：{{ loan.branch.name }}</p>
-                    <p class="card-text">申请时间：{{ loan.loan_date|date:'Y-m-d, H:i' }}</p>
-                    <p class="card-text">还款期限：{{ loan.due_date|date:'Y-m-d, H:i' }}</p>
-                    <p class="card-text">未还金额：{{ loan.remain_money|floatformat:2 }}</p>
-                    <p class="card-text">贷款状态：{{ loan.status }}</p>
-                    <p class="card-text">申请状态：{{ loan.apply_status }}</p>
+                    <p class="card-text mb-1"><strong>申请人:</strong> {{ loan.user.name }}</p>
+                    <p class="card-text mb-1"><strong>贷款金额:</strong> {{ loan.money|floatformat:2 }}</p>
+                    <p class="card-text mb-1"><strong>批准银行:</strong> {{ loan.branch.name }}</p>
+                    <p class="card-text mb-1"><strong>申请时间:</strong> {{ loan.loan_date|date:'Y-m-d, H:i' }}</p>
+                    <p class="card-text mb-1"><strong>还款期限:</strong> {{ loan.due_date|date:'Y-m-d, H:i' }}</p>
+                    <p class="card-text mb-1"><strong>未还金额:</strong> {{ loan.remain_money|floatformat:2 }}</p>
+                    <p class="card-text mb-1"><strong>贷款状态:</strong> {{ loan.status }}</p>
+                    <p class="card-text mb-1"><strong>申请状态:</strong> {{ loan.apply_status }}</p>
                 </div>
-                <div class="card-footer">
+                <div class="card-footer d-flex justify-content-end">
                     {% if loan.apply_status == '未审批' and request.user.is_staff %}
-                        <a href="{% url 'loans:approve_loan' loan.loan_id %}" class="btn btn-outline-success">审批贷款</a>
+                    <a href="{% url 'loans:approve_loan' loan.loan_id %}" class="btn btn-sm btn-outline-success me-2">审批贷款</a>
                     {% endif %}
                     {% if request.user.is_superuser %}
-                        <a href="{% url 'loans:edit_loan' loan.loan_id %}" class="btn btn-outline-primary">修改贷款信息</a>
+                    <a href="{% url 'loans:edit_loan' loan.loan_id %}" class="btn btn-sm btn-outline-primary">修改贷款信息</a>
                     {% endif %}
                 </div>
             </div>
@@ -45,29 +43,31 @@
     </div>
 </div>
 
-<div class="pagination justify-content-center mt-4">
-    <ul class="pagination">
-        {% if loans.has_previous %}
-        <li class="page-item">
-            <a href="?page=1" class="page-link">&laquo; 第一页</a>
-        </li>
-        <li class="page-item">
-            <a href="?page={{ loans.previous_page_number }}" class="page-link">{{ loans.previous_page_number }}</a>
-        </li>
-        {% endif %}
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if loans.has_previous %}
+            <li class="page-item">
+                <a href="?page=1" class="page-link">&laquo; 第一页</a>
+            </li>
+            <li class="page-item">
+                <a href="?page={{ loans.previous_page_number }}" class="page-link">{{ loans.previous_page_number }}</a>
+            </li>
+            {% endif %}
 
-        <li class="page-item active">
-            <span class="page-link">{{ loans.number }}</span>
-        </li>
+            <li class="page-item active">
+                <span class="page-link">{{ loans.number }}</span>
+            </li>
 
-        {% if loans.has_next %}
-        <li class="page-item">
-            <a href="?page={{ loans.next_page_number }}" class="page-link">{{ loans.next_page_number }}</a>
-        </li>
-        <li class="page-item">
-            <a href="?page={{ loans.paginator.num_pages }}" class="page-link">最后一页 &raquo;</a>
-        </li>
-        {% endif %}
-    </ul>
+            {% if loans.has_next %}
+            <li class="page-item">
+                <a href="?page={{ loans.next_page_number }}" class="page-link">{{ loans.next_page_number }}</a>
+            </li>
+            <li class="page-item">
+                <a href="?page={{ loans.paginator.num_pages }}" class="page-link">最后一页 &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock content %}

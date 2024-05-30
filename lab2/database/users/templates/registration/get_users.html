@@ -2,28 +2,28 @@
 {% load bootstrap4 %}
 
 {% block page_header %}
-  <h2 class="text-center my-4">客户信息</h2>
+  <h1 class="text-center my-4">客户信息</h1>
 {% endblock page_header %}
 
 {% block content %}
 <div class="container">
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for user_info in users %}
-            <div class="col-sm-6 mb-4">
+            <div class="col">
                 <div class="card h-100">
-                    <div class="card-header">
-                        <p class="card-text">客户身份证号：{{ user_info.id }}</p>
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">客户身份证号：{{ user_info.id }}</h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">客户姓名：{{ user_info.name }}</p>
-                        <p class="card-text">客户电话：{{ user_info.tel }}</p>
-                        <p class="card-text">客户地址：{{ user_info.address }}</p>
-                        <p class="card-text">客户账户数量：{{ user_info.counts }}</p>
-                        <p class="card-text">客户状态：{{ user_info.status }}</p>
-                        <p class="card-text">所属分行：{{ user_info.branch_id }}</p>
+                        <p class="card-text mb-1"><strong>客户姓名：</strong> {{ user_info.name }}</p>
+                        <p class="card-text mb-1"><strong>客户电话：</strong> {{ user_info.tel }}</p>
+                        <p class="card-text mb-1"><strong>客户地址：</strong> {{ user_info.address }}</p>
+                        <p class="card-text mb-1"><strong>客户账户数量：</strong> {{ user_info.counts }}</p>
+                        <p class="card-text mb-1"><strong>客户状态：</strong> {{ user_info.status }}</p>
+                        <p class="card-text mb-1"><strong>所属分行：</strong> {{ user_info.branch_id }}</p>
                     </div>
                     <div class="card-footer text-center">
-                        <a href="{% url 'users:edit' user_info.user_id %}" class="btn btn-outline-primary">修改信息</a>
+                        <a href="{% url 'users:edit' user_info.user_id %}" class="btn btn-primary">修改信息</a>
                     </div>
                 </div>
             </div>

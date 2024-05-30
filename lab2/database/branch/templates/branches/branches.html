@@ -2,21 +2,21 @@
 {% load bootstrap4 %}
 
 {% block page_header %}
-  <div class="text-center my-4">
-    <h2 class="text-white">支行信息</h2>
-  </div>
+<div class="text-center my-4">
+    <h1 class="text-white">支行信息</h1>
+</div>
 {% endblock page_header %}
 
 {% block content %}
 <div class="container">
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for branch in branches %}
-        <div class="col-md-6 mb-4">
-            <div class="card">
+        <div class="col">
+            <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">{{ branch.name }}</h5>
-                    <p class="card-text">地址： {{ branch.address }}</p>
-                    <p class="card-text">电话： {{ branch.tel }}</p>
+                    <h5 class="card-title mb-2">{{ branch.name }}</h5>
+                    <p class="card-text mb-1"><strong>地址:</strong> {{ branch.address }}</p>
+                    <p class="card-text mb-1"><strong>电话:</strong> {{ branch.tel }}</p>
                 </div>
             </div>
         </div>
@@ -24,29 +24,31 @@
     </div>
 </div>
 
-<div class="pagination justify-content-center mt-4">
-    <ul class="pagination">
-        {% if branches.has_previous %}
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if branches.has_previous %}
             <li class="page-item">
                 <a href="?page=1" class="page-link">&laquo; 第一页</a>
             </li>
             <li class="page-item">
                 <a href="?page={{ branches.previous_page_number }}" class="page-link">{{ branches.previous_page_number }}</a>
             </li>
-        {% endif %}
-        
-        <li class="page-item active">
-            <span class="page-link">{{ branches.number }}</span>
-        </li>
-        
-        {% if branches.has_next %}
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">{{ branches.number }}</span>
+            </li>
+
+            {% if branches.has_next %}
             <li class="page-item">
                 <a href="?page={{ branches.next_page_number }}" class="page-link">{{ branches.next_page_number }}</a>
             </li>
             <li class="page-item">
                 <a href="?page={{ branches.paginator.num_pages }}" class="page-link">最后一页 &raquo;</a>
             </li>
-        {% endif %}
-    </ul>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock content %}

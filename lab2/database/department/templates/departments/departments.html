@@ -2,28 +2,28 @@
 {% load bootstrap4 %}
 
 {% block page_header %}
-  <div class="text-center my-4">
-    <h2 class="text-white">支行部门信息</h2>
-  </div>
+<div class="text-center my-4">
+    <h1 class="text-white">支行部门信息</h1>
+</div>
 {% endblock page_header %}
 
 {% block content %}
 <div class="container">
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for department in departments %}
-        <div class="col-md-6 mb-4">
-            <div class="card">
+        <div class="col">
+            <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">部门号：{{ department.department_id }}</h5>
-                    <p class="card-text">所属支行：{{ department.branch }}</p>
-                    <p class="card-text">部门名称：{{ department.name }}</p>
-                    <p class="card-text">部门经理：{{ department.manager }}</p>
+                    <h5 class="card-title mb-2">{{ department.name }}</h5>
+                    <p class="card-text mb-1"><strong>部门号:</strong> {{ department.department_id }}</p>
+                    <p class="card-text mb-1"><strong>所属支行:</strong> {{ department.branch }}</p>
+                    <p class="card-text mb-1"><strong>部门经理:</strong> {{ department.manager }}</p>
                 </div>
-                <div class="card-footer">
-                    <a href="{% url 'departments:department_staffs' department.department_id %}" class="btn btn-outline-light">员工信息</a>
+                <div class="card-footer d-flex justify-content-end">
+                    <a href="{% url 'departments:department_staffs' department.department_id %}" class="btn btn-sm btn-outline-primary me-2">员工信息</a>
                     {% if user.is_superuser %}
-                        <a href="{% url 'staffs:create_staff' department.department_id %}" class="btn btn-outline-light">创建员工</a>
-                        <a href="{% url 'staffs:delete_manager' department.department_id %}" class="btn btn-outline-light">取消经理</a>
+                    <a href="{% url 'staffs:create_staff' department.department_id %}" class="btn btn-sm btn-outline-success me-2">创建员工</a>
+                    <a href="{% url 'staffs:delete_manager' department.department_id %}" class="btn btn-sm btn-outline-danger">取消经理</a>
                     {% endif %}
                 </div>
             </div>
@@ -32,29 +32,31 @@
     </div>
 </div>
 
-<div class="pagination justify-content-center mt-4">
-    <ul class="pagination">
-        {% if departments.has_previous %}
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if departments.has_previous %}
             <li class="page-item">
                 <a href="?page=1" class="page-link">&laquo; 第一页</a>
             </li>
             <li class="page-item">
                 <a href="?page={{ departments.previous_page_number }}" class="page-link">{{ departments.previous_page_number }}</a>
             </li>
-        {% endif %}
-        
-        <li class="page-item active">
-            <span class="page-link">{{ departments.number }}</span>
-        </li>
-        
-        {% if departments.has_next %}
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">{{ departments.number }}</span>
+            </li>
+
+            {% if departments.has_next %}
             <li class="page-item">
                 <a href="?page={{ departments.next_page_number }}" class="page-link">{{ departments.next_page_number }}</a>
             </li>
             <li class="page-item">
                 <a href="?page={{ departments.paginator.num_pages }}" class="page-link">最后一页 &raquo;</a>
             </li>
-        {% endif %}
-    </ul>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock content %}

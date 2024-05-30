@@ -3,36 +3,38 @@
 
 {% block page_header %}
   <div class="text-center my-4">
-    <h2 class="text-white">账户信息</h2>
-    <p class="text-light">
-      身份证号码： {{ account_user.id }}，
-      客户名： {{ account_user.name }}，
-      电话： {{ account_user.tel }}，
-      家庭住址： {{ account_user.address }}，
-      账户数量： {{ account_user.counts }}
-    </p>
+    <h1 class="text-white">账户信息</h1>
+    <div class="text-white">
+      <p><strong>身份证号码:</strong> {{ account_user.id }}</p>
+      <p><strong>客户名:</strong> {{ account_user.name }}</p>
+      <p><strong>电话:</strong> {{ account_user.tel }}</p>
+      <p><strong>家庭住址:</strong> {{ account_user.address }}</p>
+      <p><strong>账户数量:</strong> {{ account_user.counts }}</p>
+    </div>
   </div>
 {% endblock page_header %}
 
 {% block content %}
 <div class="container">
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for account in accounts %}
-            <div class="card mb-4 col-md-6 bg-dark text-light">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">卡号： {{ account.account_id }}</h4>
-                    <a href="{% url 'accounts:delete_account' account.account_id %}" class="btn btn-outline-danger">删除账户</a>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">持有人： {{ account.user.name }}</p>
-                    <p class="card-text">余额： {{ account.money|floatformat:2 }}元</p>
-                    <p class="card-text">开户银行名称： {{ account.branch.name }}</p>
-                    <p class="card-text">开户时间：{{ account.create_date|date:'Y-m-d, H:i' }}</p>
-                </div>
-                <div class="card-footer">
-                    <a href="{% url 'accounts:transfer' account.account_id %}" class="btn btn-outline-light">转账</a>
-                    <a href="{% url 'bills:create_bill' account.account_id %}" class="btn btn-outline-light">创建账单</a>
-                    <a href="{% url 'bills:bills' account.account_id %}" class="btn btn-outline-light">账单详情</a>
+            <div class="col">
+                <div class="card h-100 bg-dark text-light">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-primary">
+                        <h5 class="card-title mb-0">卡号：{{ account.account_id }}</h5>
+                        <a href="{% url 'accounts:delete_account' account.account_id %}" class="btn btn-danger btn-sm">删除账户</a>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text mb-1"><strong>持有人：</strong> {{ account.user.name }}</p>
+                        <p class="card-text mb-1"><strong>余额：</strong> {{ account.money|floatformat:2 }} 元</p>
+                        <p class="card-text mb-1"><strong>开户银行名称：</strong> {{ account.branch.name }}</p>
+                        <p class="card-text mb-1"><strong>开户时间：</strong> {{ account.create_date|date:'Y-m-d, H:i' }}</p>
+                    </div>
+                    <div class="card-footer bg-dark d-flex justify-content-center">
+                        <a href="{% url 'accounts:transfer' account.account_id %}" class="btn btn-outline-light me-2">转账</a>
+                        <a href="{% url 'bills:create_bill' account.account_id %}" class="btn btn-outline-light me-2">创建账单</a>
+                        <a href="{% url 'bills:bills' account.account_id %}" class="btn btn-outline-light">账单详情</a>
+                    </div>
                 </div>
             </div>
         {% endfor %}
