@@ -6,9 +6,9 @@ from accounts.models import UserAccounts
 from django.core.paginator import Paginator
 from django.contrib import messages
 from users.models import BankUser
+from django.db import transaction
 
 
-# Create your views here.
 @login_required
 def create_bill(request, account_id):
     account = UserAccounts.objects.get(account_id=account_id)
@@ -37,12 +37,19 @@ def create_bill(request, account_id):
                     messages.warning(request, '余额不足')
                     return render(request, 'frontend/error.html')
                 
-                bill = AccountBills.objects.create(account=account, changes=changes,
-                                                   type=bill_type, remark=form.cleaned_data.get("remark"), money=new_money)
-                bill.save()
-                account.money = new_money
-                account.save()
-                return redirect('bills:bills', account_id=account.account_id)
+                try:
+                    with transaction.atomic():
+                        bill = AccountBills.objects.create(
+                            account=account, changes=changes,
+                            type=bill_type, remark=form.cleaned_data.get("remark"), money=new_money
+                        )
+                        bill.save()
+                        account.money = new_money
+                        account.save()
+                    return redirect('bills:bills', account_id=account.account_id)
+                except Exception as e:
+                    messages.error(request, f'操作失败: {str(e)}')
+                    return render(request, 'frontend/error.html')
     
     context = {'form': form, 'account': account}
     return render(request, 'bills/create_bill.html', context)
@@ -51,7 +58,6 @@ def create_bill(request, account_id):
 @login_required
 def bills(request, account_id):
     account = UserAccounts.objects.get(account_id=account_id)
-    # judge if the user is the owner of the account
     user_id = BankUser.objects.get(id=account.user_id).user_id
     if request.user.id != user_id:
         messages.warning(request, '无法查看他人账单')
